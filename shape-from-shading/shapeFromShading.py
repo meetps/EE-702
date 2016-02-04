@@ -12,7 +12,7 @@ source = [0,0,1] 			# Coordinate of Light Source
 Lambda = 100				# Regularization Parameter
 noiseSNR = 5; 				# Noise to signal ratio
 radiusToImageRatio = 0.25	# Radius to Image dimensions ratio
-sphereImageSize = 75   # Radius of the spehere to be rendered
+sphereImageSize = 50   # Radius of the spehere to be rendered
 
 #######################################################
 # Rendering the 3D Surface
@@ -21,7 +21,7 @@ depthMap         = np.zeros((sphereImageSize,sphereImageSize))                  
 clippingMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
 regionOfInterest = np.zeros((sphereImageSize,sphereImageSize))                     # Boolean flag to mark the sphere ROI
 radius           = radiusToImageRatio * sphereImageSize                            # Radius of the sphere
-clippingRadius   = radius * 0.95
+clippingRadius   = radius * 0.98
 [cols,rows] 	 = np.meshgrid(range(0,sphereImageSize),range(0,sphereImageSize))  # Meshgrid for base of computation
 
 #Calculating the depth using z^2 = r^2 - x^2 - y^2  for each point in the depth map
@@ -72,6 +72,11 @@ for i in range(0,sphereImageSize):
 #######################################################
 # Detecting Boundary using Morphological Operations from OpenCV
 #######################################################
+
+# rad = cv2.imread('im2.JPG')
+# plt.imshow(rad)
+# radiance = np.asarray(rad)
+
 boundaryMap              = np.zeros((sphereImageSize,sphereImageSize))
 regionOfInterestRadiance = radiance > 0
 kernel                   = np.ones((3,3),np.uint8)
@@ -87,7 +92,8 @@ p,q = p * intersectionROI , q * intersectionROI
 # Occluding Boundary gradients
 #######################################################
 # gradX, gradY       = radiance, radiance
-gradX, gradY       = np.array(depthMap,copy=True),np.array(depthMap,copy=True)
+gradX, gradY       = np.array(radiance,copy=True),np.array(radiance,copy=True)
+#gradX, gradY = np.zeros(depthMap.shape),np.zeros(depthMap.shape)
 gradX[:][1:-1]     = (  gradX[:][2:]   - gradX[:][:-2]) * 0.5 
 gradY[1:-1][:]     = (  gradY[:-2][:]  - gradY[2:][:] ) * 0.5
 # gradX = gradX * boundaryMap.astype(bool)
@@ -101,7 +107,7 @@ qBoundary = qBoundary - qBoundary * (1 - boundaryMap)
 #######################################################
 # Iterative Shape from shading
 #######################################################
-limit = 100
+limit = 1000
 p_next,q_next = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)
 p_estimated,q_estimated = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)	
 
@@ -124,7 +130,7 @@ for iteration in range(0,limit):
 #######################################################
 # Depth Retrieval 
 #######################################################
-limit = 100
+limit = 1000
 Z_p   = np.zeros(p_estimated.shape)
 Z     = np.zeros(p_estimated.shape)
 p_x,q_y = np.array(p_estimated,copy=True),np.array(q_estimated,copy=True)
@@ -140,10 +146,11 @@ for iteration in range(0,limit):
 Z_estimated = Z * regionOfInterestRadiance
 #Z_estimated = Z_estimated
 
-print(np.amax(Z_estimated))
+print(np.amax(radiance))
+print(np.amin(radiance))
 
 # print(q_y[sphereImageSize/2])
-print(p_x[sphereImageSize/2])
+# print(p_x[sphereImageSize/2])
 # print(p_x[sphereImageSize/2])
 #######################################################
 # Visualization of the Depth
@@ -153,6 +160,6 @@ ax = fig.gca(projection='3d')
 ax.set_xlim3d(0,sphereImageSize)
 ax.set_ylim3d(0,sphereImageSize)
 ax.set_zlim3d(0,sphereImageSize)
-surf = ax.plot_surface(rows, cols, Z_estimated/4, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+surf = ax.plot_surface(rows, cols, Z_estimated, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=1, aspect=5)
 plt.show()
