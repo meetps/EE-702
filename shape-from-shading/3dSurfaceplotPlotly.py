@@ -1,5 +1,6 @@
 import plotly.plotly as py
 import plotly.graph_objs as go
+from plotly.graph_objs import *
 import numpy as np
 import plotly.tools as tls
 tls.set_credentials_file(username='meetshah1995efe3', api_key='mxg1wama31')
@@ -13,6 +14,20 @@ layout = go.Layout(
     autosize=False,
     width=500,
     height=500,
+    scene=Scene(
+        xaxis=dict(
+            autorange=False,
+            range=[0, 50]  # set axis range
+        ),
+        yaxis=dict(
+            autorange=False,
+            range=[0, 50]
+        ),
+        zaxis=dict(
+            autorange=False,
+            range=[0,50]
+        )
+    ),
     margin=dict(
         l=65,
         r=50,

@@ -11,10 +11,10 @@ from tqdm import *
 #######################################################
 source = [0,0,1] 			 # Coordinate of Light Source
 Lambda = 100				 # Regularization Parameter
-noiseRadiance = 0 		     # Noise to radiance ratio
-noiseSoure = 0               # Noise to source ratio
+noiseRadiance = 0.00 		 # Noise to radiance ratio
+noiseSource = 0.01           # Noise to source ratio
 radiusToImageRatio = 0.25	 # Radius to Image dimensions ratio
-sphereImageSize = 100         # Radius of the spehere to be rendered
+sphereImageSize = 50         # Radius of the spehere to be rendered
 soslimit = 1000				 # No of iters for Shape from Shading
 depthlimit = 1000			 # No of iters for depth retrieval
 
@@ -89,6 +89,7 @@ p,q = p * intersectionROI , q * intersectionROI
 noiseR = np.random.normal(0,1,sphereImageSize*sphereImageSize)
 noiseR = noiseR.reshape(sphereImageSize,sphereImageSize)*noiseRadiance
 radiance = radiance + noiseR
+source = source + np.random.normal(0,1,3)*noiseSource
 
 #######################################################
 # Occluding Boundary gradients
@@ -156,7 +157,7 @@ ax = fig.gca(projection='3d')
 ax.set_xlim3d(0,sphereImageSize)
 ax.set_ylim3d(0,sphereImageSize)
 ax.set_zlim3d(0,sphereImageSize)
-filename = 'r_' + str(sphereImageSize) + 'nr_' + str(noiseRadiance) + 'ns_' + str(noiseSoure) + 'lambda_' + str(Lambda)
+filename = 'r_' + str(sphereImageSize) + 'nr_' + str(noiseRadiance) + 'ns_' + str(noiseSource) + 'lambda_' + str(Lambda)
 np.save('results/' + filename ,Z_estimated)
 surf = ax.plot_surface(rows, cols, Z_estimated, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=1, aspect=5)
