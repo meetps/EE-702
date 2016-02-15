@@ -5,6 +5,39 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
+def changeParams(param1, param2, sourceParamType):
+    if sourceParamType == 'pq':
+        p = np.array(param1,copy=True)
+        q = np.array(param2,copy=True) 
+        if param1.shape[0] > 1:
+            tanPQ = (p**2 + q**2)**(0.5)
+            # plt.imshow(tanPQ)
+            # print np.amax(param1)
+            # tanFG = np.tan(0.5*np.arctan(tanPQ))
+            f = 2*p/(1 + (1+ p**2 + q**2)**(0.5) )
+            g = 2*q/(1 + (1+ p**2 + q**2)**(0.5) )
+            return f,g
+        else:
+            tanPQ = (p**2 + q**2)^0.5
+            tanFG = np.tan(0.5*np.arctan(tanPQ));
+            f = 2*p*tanFG/tanPQ
+            g = 2*q*tanFG/tanPQ
+            return f,g
+    else: 
+    #Converting fg => pq
+        f = np.array(param1,copy=True)
+        g = np.array(param2,copy=True)    
+        threshold = 1.5
+        if param1.shape[0] > 1:
+            denImage = 4-f**2-g**2
+            p = 4*f/denImage
+            q = 4*g/denImage
+            return p, q
+        else:
+            p = 4*f/(4-f**2-g**2)
+            q = 4*g/(4-f**2-g**2)
+            return p, q
+
 #######################################################
 # Parameter Definition
 #######################################################
@@ -21,7 +54,7 @@ depthMap         = np.zeros((sphereImageSize,sphereImageSize))                  
 clippingMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
 regionOfInterest = np.zeros((sphereImageSize,sphereImageSize))                     # Boolean flag to mark the sphere ROI
 radius           = radiusToImageRatio * sphereImageSize                            # Radius of the sphere
-clippingRadius   = radius * 0.98
+clippingRadius   = radius * 0.95
 [cols,rows] 	 = np.meshgrid(range(0,sphereImageSize),range(0,sphereImageSize))  # Meshgrid for base of computation
 
 #Calculating the depth using z^2 = r^2 - x^2 - y^2  for each point in the depth map
@@ -78,6 +111,7 @@ for i in range(0,sphereImageSize):
 # radiance = np.asarray(rad)
 # plt.imshow(radiance)
 
+
 boundaryMap              = np.zeros((sphereImageSize,sphereImageSize))
 regionOfInterestRadiance = radiance > 0
 kernel                   = np.ones((3,3),np.uint8)
@@ -85,6 +119,7 @@ boundaryMap              = regionOfInterestRadiance - cv2.erode(regionOfInterest
 boundaryMap              = cv2.erode(cv2.dilate(boundaryMap.astype(np.uint8),kernel,3),kernel,3) 
 intersectionROI          = regionOfInterest * regionOfInterestRadiance
 p,q = p * intersectionROI , q * intersectionROI
+
 
 # print(sum(sum(boundaryMap)))
 
@@ -97,11 +132,17 @@ gradX, gradY       = np.array(radiance,copy=True),np.array(radiance,copy=True)
 #gradX, gradY = np.zeros(depthMap.shape),np.zeros(depthMap.shape)
 gradX[:][1:-1]     = (  gradX[:][2:]   - gradX[:][:-2]) * 0.5 
 gradY[1:-1][:]     = (  gradY[:-2][:]  - gradY[2:][:] ) * 0.5
-plt.imshow(gradX)
+# plt.imshow(gradX)
 # gradX = gradX * boundaryMap.astype(bool)
 # gradY = gradY * boundaryMap.astype(bool)
-pBoundary = np.array(gradX * boundaryMap.astype(bool),copy=True)
-qBoundary = np.array(gradY * boundaryMap.astype(bool),copy=True)
+
+f,g = changeParams(gradX,gradY,'pq')
+# f,g = gradX, gradY
+
+#f,g = f * intersectionROI , g * intersectionROI
+
+pBoundary = np.array(f * boundaryMap.astype(bool),copy=True)
+qBoundary = np.array(g * boundaryMap.astype(bool),copy=True)
 pBoundary = pBoundary - pBoundary * (1 - boundaryMap)
 qBoundary = qBoundary - qBoundary * (1 - boundaryMap)
 # print(pBoundary)
@@ -109,30 +150,40 @@ qBoundary = qBoundary - qBoundary * (1 - boundaryMap)
 #######################################################
 # Iterative Shape from shading
 #######################################################
-limit = 10
+limit = 1000
 p_next,q_next = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)
 p_estimated,q_estimated = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)	
 
 for iteration in range(0,limit):
-	print('Starting Iteration :', iteration+1)
+	# print('Starting Iteration :', iteration+1)
 	for i in range(1,pBoundary.shape[0] -1):
 		for j in range(1,pBoundary.shape[1] -1):
 			if regionOfInterestRadiance[i][j] == 1 :
 				RadianceX,RadianceY = 0,0
-				radianc = (p_estimated[i][j] * source[0] + q_estimated[i][j] * source[1] + 1) / ( ((source[0]**2+source[1]**2 + 1)**0.5) *((p_estimated[i][j]**2 + q_estimated[i][j]**2 + 1)**0.5))
-				RadianceX = (p_estimated[i][j]**2 *source[0] + source[0] - q_estimated[i][j]*q_estimated[i][j]*source[1] - p_estimated[i][j])/(((source[0]**2 + source[1]**2 + 1)**0.5)*(p_estimated[i][j]**2 + (q_estimated[i][j]**2 + 1)**0.5)**3)
-				RadianceY = (q_estimated[i][j]**2 *source[1] + source[1] - p_estimated[i][j]*p_estimated[i][j]*source[0] - q_estimated[i][j])/(((source[0]**2 + source[1]**2 + 1)**0.5)*(p_estimated[i][j]**2 + (q_estimated[i][j]**2 + 1)**0.5)**3)
+				Rnum = 16*(source[0]*f[i][j] + source[1]*g[i][j]) + (4-f[i][j]**2-g[i][j]**2)*(4-source[0]**2-source[1]**2);
+				Rden = (4 + f[i][j]**2 + g[i][j]**2)*(source[0]**2 + source[1]**2 + 4);
+				radianc = Rnum / Rden;
+				RadianceX = (-1*(16*source[0] - 2*f[i][j]*(4-source[0]**2-source[1]**2)*Rden) - Rnum*(2*f[i][j]*(4+source[0]**2+source[1]**2)))/Rden**2;
+				RadianceY = (-1*(16*source[1] - 2*g[i][j]*(4-source[0]**2-source[1]**2)*Rden) - Rnum*(2*g[i][j]*(4+source[0]**2+source[1]**2)))/Rden**2;
+				# radianc = (p_estimated[i][j] * source[0] + q_estimated[i][j] * source[1] + 1) / ( ((source[0]**2+source[1]**2 + 1)**0.5) *((p_estimated[i][j]**2 + q_estimated[i][j]**2 + 1)**0.5))
+				# RadianceX = (p_estimated[i][j]**2 *source[0] + source[0] - q_estimated[i][j]*q_estimated[i][j]*source[1] - p_estimated[i][j])/(((source[0]**2 + source[1]**2 + 1)**0.5)*(p_estimated[i][j]**2 + (q_estimated[i][j]**2 + 1)**0.5)**3)
+				# RadianceY = (q_estimated[i][j]**2 *source[1] + source[1] - p_estimated[i][j]*p_estimated[i][j]*source[0] - q_estimated[i][j])/(((source[0]**2 + source[1]**2 + 1)**0.5)*(p_estimated[i][j]**2 + (q_estimated[i][j]**2 + 1)**0.5)**3)
 				p_next[i][j] = 0.25*(p_estimated[i-1][j] + p_estimated[i+1][j] + p_estimated[i][j-1] + p_estimated[i][j+1]) - 1/Lambda *(radiance[i][j] - radianc)*RadianceX;
 				q_next[i][j] = 0.25*(q_estimated[i-1][j] + q_estimated[i+1][j] + q_estimated[i][j-1] + q_estimated[i][j+1]) - 1/Lambda *(radiance[i][j] - radianc)*RadianceY;
+
 	p_estimated = (p_next*regionOfInterestRadiance*(1-boundaryMap.astype(bool))) + pBoundary*boundaryMap*regionOfInterestRadiance
 	q_estimated = (q_next*regionOfInterestRadiance*(1-boundaryMap.astype(bool))) + qBoundary*boundaryMap*regionOfInterestRadiance
+
+p_est, q_est = changeParams(p_estimated, q_estimated, 'fg')
+p_estimated = p_est# * (p_est<2)
+q_estimated = q_est# * (q_est<2)
 
 # print(p_estimated[sphereImageSize/2])
 
 #######################################################
 # Depth Retrieval 
 #######################################################
-limit = 10
+limit = 1000
 Z_p   = np.zeros(p_estimated.shape)
 Z     = np.zeros(p_estimated.shape)
 p_x,q_y = np.array(p_estimated,copy=True),np.array(q_estimated,copy=True)
