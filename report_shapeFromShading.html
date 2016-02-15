@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>EE-702</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    
+    <section class="main-content">
+      <h2>
+<a id="ee-702-project-reports" class="anchor" href="#ee-702-project-reports" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Shape from Shading Project Report</h2>
+
+<p align="center"> Meet Shah | Yash Bhalgat</p>
+<p align="center">13D070003 | 13D070014</p>
+
+<h3>For Parameters PQ</h3>
+<h3>Different Radii</h3>
+
+<table>
+  <tr><td>
+<h5> R = 12.5 </h5>
+<img src="output/r_50.png"/>    
+  </td>
+
+<td>
+<h5> R = 18.75 </h5>
+<img src="output/r_75.png"/>
+</td>
+<td><h5> R = 25 </h5>
+<img src="output/r_100.png"/></td>
+  </tr>
+</table>
+
+<h3>Different Lambda</h3> 
+
+<table>
+  <tr>
+    <td>
+<h5> lambda = 10 </h5>
+<img src="output/r50_lambda_10.png"/>
+      
+    </td>
+    <td>
+<h5> lambda = 100 </h5>
+<img src="output/r_50.png"/>
+      
+    </td>
+    <td>
+<h5> lambda = 1000 </h5>
+<img src="output/r50_lambda_1000.png"/>
+      
+    </td>
+
+  </tr>
+
+
+</table>
+
+<h3>Different Noise in Radiance</h3>
+<table>
+  <tr>
+    <td>
+<h5> NoiseRatio = 0.01 </h5>
+<img src="output/r50_nr_01.png"/>
+      
+    </td>
+    <td>
+<h5> NoiseRatio = 0.1 </h5>
+<img src="output/r50_nr_1.png"/>
+      
+    </td>
+  </tr>
+
+</table>
+
+<h3>Different Noise in Source</h3>
+
+<table>
+  <tr>
+    <td><h5> NoiseRatio = 0.1 </h5>
+    <img src="output/r50_ns_1.png"/></td>
+    <td>
+<h5> NoiseRatio = 0.01 </h5>
+<img src="output/r50_ns_01.png"/></td>
+  </tr>
+</table>
+
+<h3>3D Interactive Plot for best parameters</h3>
+<div>
+    <a href="https://plot.ly/~meetshah1995efe3/6/" target="_blank" title="Shape from Shading" style="display: block; text-align: center;"><img src="https://plot.ly/~meetshah1995efe3/6.png" alt="Shape from Shading" style="max-width: 100%;width: 500px;"  width="500" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="meetshah1995efe3:6"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+<h3>Depth Estimation for some standard images</h3>
+<table>
+  <tr>
+    <td><h5> Original Image </h5>
+    <img src="output/r50_ns_1.png"/></td>
+    <td>
+<h5> DepthMap </h5>
+<img src="output/r50_ns_01.png"/></td>
+  </tr>
+</table>
+
+<h3>For Parameters FG</h3>
+  </section>  
+  </body>
+</html>
