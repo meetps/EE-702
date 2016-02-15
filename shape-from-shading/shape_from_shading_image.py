@@ -14,60 +14,6 @@ noiseSNR = 5; 				# Noise to signal ratio
 radiusToImageRatio = 0.25	# Radius to Image dimensions ratio
 sphereImageSize = 75   # Radius of the spehere to be rendered
 
-#######################################################
-# Rendering the 3D Surface
-#######################################################
-depthMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
-clippingMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
-regionOfInterest = np.zeros((sphereImageSize,sphereImageSize))                     # Boolean flag to mark the sphere ROI
-radius           = radiusToImageRatio * sphereImageSize                            # Radius of the sphere
-clippingRadius   = radius * 0.98
-[cols,rows] 	 = np.meshgrid(range(0,sphereImageSize),range(0,sphereImageSize))  # Meshgrid for base of computation
-
-#Calculating the depth using z^2 = r^2 - x^2 - y^2  for each point in the depth map
-for i in range(0,sphereImageSize):
-	for j in range(0,sphereImageSize):
-		depthMap[i][j] = radius**2 - math.pow(cols[i][j] - sphereImageSize/2 , 2) - math.pow(rows[i][j] - sphereImageSize/2 , 2);
-		if(depthMap[i][j] > 0):
-			regionOfInterest[i][j] = 1;
-
-depthMap = np.sqrt(depthMap * regionOfInterest)
-
-
-for i in range(0,sphereImageSize):
-	for j in range(0,sphereImageSize):
-		clippingMap[i][j] = clippingRadius**2 - math.pow(cols[i][j] - sphereImageSize/2 , 2) - math.pow(rows[i][j] - sphereImageSize/2 , 2);
-		if(clippingMap[i][j] > 0):
-			regionOfInterest[i][j] = 1;
-
-
-depthMap = depthMap * regionOfInterest
-
-# print(depthMap)
-# print(regionOfInterest)
-
-#######################################################
-# Calculating the x, y Gradient Fields p and q
-#######################################################
-p,q = np.zeros((sphereImageSize,sphereImageSize)),np.zeros((sphereImageSize,sphereImageSize))
-for i in range(1,sphereImageSize-1):
-	for j in range(1,sphereImageSize-1):
-		p[i][j] = depthMap[i][j] - depthMap[i][j-1]
-		q[i][j] = depthMap[i][j] - depthMap[i-1][j]  
-
-p,q = p * regionOfInterest, q * regionOfInterest
-# print(p)
-#######################################################
-# Calculating the image radiance from gradient fields
-#######################################################
-radiance = np.zeros((sphereImageSize,sphereImageSize))	
-for i in range(0,sphereImageSize):
-	for j in range(0,sphereImageSize):
-		if(regionOfInterest[i][j]):
-			radiance[i][j] = (p[i,j]*source[0] + q[i,j]*source[1] + 1)/(((source[0]**2+source[1]**2 + 1)**0.5)*((p[i,j]**2 + q[i,j]**2 + 1)**0.5))
-			if (radiance[i][j] < 0 ):
-				radiance[i][j] = 0
-# print(radiance)
 
 #######################################################
 # Detecting Boundary using Morphological Operations from OpenCV
