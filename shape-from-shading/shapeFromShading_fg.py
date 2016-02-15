@@ -45,7 +45,7 @@ source = [0,0,1] 			# Coordinate of Light Source
 Lambda = 100				# Regularization Parameter
 noiseSNR = 5; 				# Noise to signal ratio
 radiusToImageRatio = 0.25	# Radius to Image dimensions ratio
-sphereImageSize = 75   # Radius of the spehere to be rendered
+sphereImageSize = 100   # Radius of the spehere to be rendered
 
 #######################################################
 # Rendering the 3D Surface
@@ -155,7 +155,7 @@ p_next,q_next = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)
 p_estimated,q_estimated = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)	
 
 for iteration in range(0,limit):
-	# print('Starting Iteration :', iteration+1)
+	print('Starting Iteration :', iteration+1)
 	for i in range(1,pBoundary.shape[0] -1):
 		for j in range(1,pBoundary.shape[1] -1):
 			if regionOfInterestRadiance[i][j] == 1 :
