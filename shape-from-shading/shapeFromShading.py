@@ -152,12 +152,13 @@ print('=====> Finished Depth Retrieval')
 #######################################################
 # Visualization of the Depth
 #######################################################
+plt.imshow(Z_estimated)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.set_xlim3d(0,sphereImageSize)
 ax.set_ylim3d(0,sphereImageSize)
 ax.set_zlim3d(0,sphereImageSize)
-filename = 'r_' + str(sphereImageSize) + 'nr_' + str(noiseRadiance) + 'ns_' + str(noiseSource) + 'lambda_' + str(Lambda)
+filename = 'r_' + str(sphereImageSize) + 'nr_' + str(noiseRadiance) + 'ns_' + str(noiseSource) + 'lambda_' + str(Lambda) + '_pq'
 np.save('results/' + filename ,Z_estimated)
 surf = ax.plot_surface(rows, cols, Z_estimated, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=1, aspect=5)

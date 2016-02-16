@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+from tqdm import *
 
 def changeParams(param1, param2, sourceParamType):
     if sourceParamType == 'pq':
@@ -44,12 +45,17 @@ def changeParams(param1, param2, sourceParamType):
 source = [0,0,1] 			# Coordinate of Light Source
 Lambda = 100				# Regularization Parameter
 noiseSNR = 5; 				# Noise to signal ratio
+noiseRadiance = 0.00 		 # Noise to radiance ratio
+noiseSource = 0.01           # Noise to source ratio
 radiusToImageRatio = 0.25	# Radius to Image dimensions ratio
 sphereImageSize = 100   # Radius of the spehere to be rendered
+soslimit = 1000				 # No of iters for Shape from Shading
+depthlimit = 1000			 # No of iters for depth retrieval
 
 #######################################################
 # Rendering the 3D Surface
 #######################################################
+print('=====> Starting Sphere Rendering')
 depthMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
 clippingMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
 regionOfInterest = np.zeros((sphereImageSize,sphereImageSize))                     # Boolean flag to mark the sphere ROI
@@ -75,9 +81,9 @@ for i in range(0,sphereImageSize):
 
 
 depthMap = depthMap * regionOfInterest
+print('=====> Finished Sphere Rendering')
 
-# print(depthMap)
-# print(regionOfInterest)
+print('=====> Starting Gradient Field Calculation')
 
 #######################################################
 # Calculating the x, y Gradient Fields p and q
@@ -89,7 +95,7 @@ for i in range(1,sphereImageSize-1):
 		q[i][j] = depthMap[i][j] - depthMap[i-1][j]  
 
 p,q = p * regionOfInterest, q * regionOfInterest
-# print(p)
+
 #######################################################
 # Calculating the image radiance from gradient fields
 #######################################################
@@ -100,7 +106,10 @@ for i in range(0,sphereImageSize):
 			radiance[i][j] = (p[i,j]*source[0] + q[i,j]*source[1] + 1)/(((source[0]**2+source[1]**2 + 1)**0.5)*((p[i,j]**2 + q[i,j]**2 + 1)**0.5))
 			if (radiance[i][j] < 0 ):
 				radiance[i][j] = 0
-# print(radiance)
+
+print('=====> Finished Gradient Field Calculation')
+
+print('=====> Starting Boundary Gradient Calculation')
 
 #######################################################
 # Detecting Boundary using Morphological Operations from OpenCV
@@ -121,7 +130,10 @@ intersectionROI          = regionOfInterest * regionOfInterestRadiance
 p,q = p * intersectionROI , q * intersectionROI
 
 
-# print(sum(sum(boundaryMap)))
+noiseR = np.random.normal(0,1,sphereImageSize*sphereImageSize)
+noiseR = noiseR.reshape(sphereImageSize,sphereImageSize)*noiseRadiance
+radiance = radiance + noiseR
+source = source + np.random.normal(0,1,3)*noiseSource
 
 
 #######################################################
@@ -145,7 +157,10 @@ pBoundary = np.array(f * boundaryMap.astype(bool),copy=True)
 qBoundary = np.array(g * boundaryMap.astype(bool),copy=True)
 pBoundary = pBoundary - pBoundary * (1 - boundaryMap)
 qBoundary = qBoundary - qBoundary * (1 - boundaryMap)
-# print(pBoundary)
+
+print('=====> Finished Boundary Gradient Calculation')
+
+print('=====> Starting Iterative Shape from shading')
 
 #######################################################
 # Iterative Shape from shading
@@ -154,8 +169,8 @@ limit = 1000
 p_next,q_next = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)
 p_estimated,q_estimated = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)	
 
-for iteration in range(0,limit):
-	print('Starting Iteration :', iteration+1)
+for iteration in tqdm(range(0,soslimit)):
+	# print('Starting Iteration :', iteration+1)
 	for i in range(1,pBoundary.shape[0] -1):
 		for j in range(1,pBoundary.shape[1] -1):
 			if regionOfInterestRadiance[i][j] == 1 :
@@ -178,18 +193,20 @@ p_est, q_est = changeParams(p_estimated, q_estimated, 'fg')
 p_estimated = p_est# * (p_est<2)
 q_estimated = q_est# * (q_est<2)
 
-# print(p_estimated[sphereImageSize/2])
+print('=====> Finished Iterative Shape from shading')
+
+print('=====> Starting Depth Retrieval')
 
 #######################################################
 # Depth Retrieval 
 #######################################################
-limit = 1000
+# limit = 1000
 Z_p   = np.zeros(p_estimated.shape)
 Z     = np.zeros(p_estimated.shape)
 p_x,q_y = np.array(p_estimated,copy=True),np.array(q_estimated,copy=True)
 p_x[:][1:-1] = ( p_estimated[:][2:] - p_estimated[:][:-2]);
 q_y[1:-1][:] = ( q_estimated[:-2][:] - q_estimated[2:][:]);
-for iteration in range(0,limit):
+for iteration in tqdm(range(0,depthlimit)):
 	for i in range(1,p_estimated.shape[0]-1):
 		for j in range(1,p_estimated.shape[1]-1):
 			if regionOfInterestRadiance[i][j] == 1 :
@@ -205,14 +222,18 @@ print(np.amin(radiance))
 # print(q_y[sphereImageSize/2])
 # print(p_x[sphereImageSize/2])
 # print(p_x[sphereImageSize/2])
+print('=====> Finished Depth Retrieval')
 #######################################################
 # Visualization of the Depth
 #######################################################
+plt.imshow(Z_estimated)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.set_xlim3d(0,sphereImageSize)
 ax.set_ylim3d(0,sphereImageSize)
 ax.set_zlim3d(0,sphereImageSize)
 surf = ax.plot_surface(rows, cols, Z_estimated, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+filename = 'r_' + str(sphereImageSize) + 'nr_' + str(noiseRadiance) + 'ns_' + str(noiseSource) + 'lambda_' + str(Lambda) + 'fg'
+np.save('results/' + filename ,Z_estimated)
 fig.colorbar(surf, shrink=1, aspect=5)
 plt.show()
