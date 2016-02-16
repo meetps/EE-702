@@ -10,9 +10,9 @@ from tqdm import *
 # Parameter Definition
 #######################################################
 source = [0,0,1] 			 # Coordinate of Light Source
-Lambda = 100				 # Regularization Parameter
+Lambda = 1000				 # Regularization Parameter
 noiseRadiance = 0.00 		 # Noise to radiance ratio
-noiseSource = 0.01           # Noise to source ratio
+noiseSource = 0.00           # Noise to source ratio
 radiusToImageRatio = 0.25	 # Radius to Image dimensions ratio
 sphereImageSize = 50         # Radius of the spehere to be rendered
 soslimit = 1000				 # No of iters for Shape from Shading
