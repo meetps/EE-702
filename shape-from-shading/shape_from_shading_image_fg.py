@@ -105,8 +105,8 @@ for i in range(0,sphereImageSize):
 #######################################################
 # Detecting Boundary using Morphological Operations from OpenCV
 #######################################################
-
-rad = cv2.imread('im3.JPG')
+inputImage = 'input/im4.JPG'
+rad = cv2.imread(inputImage)
 rad = cv2.cvtColor(rad, cv2.COLOR_RGB2GRAY)
 rad = cv2.resize(rad,None,fx=0.07,fy=0.07,interpolation=cv2.INTER_CUBIC)
 radiance = np.asarray(rad)
@@ -213,6 +213,7 @@ print(np.amin(radiance))
 # Visualization of the Depth
 #######################################################
 plt.imshow(Z_estimated)
+plt.savefig('results/fg/depth_images/' + inputImage[6:-4] + 'depthMap.png')
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.set_xlim3d(0,max(radiance.shape))

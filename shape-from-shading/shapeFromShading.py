@@ -1,5 +1,5 @@
 import cv2
-import math
+import math	
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -11,8 +11,8 @@ from tqdm import *
 #######################################################
 source = [0,0,1] 			 # Coordinate of Light Source
 Lambda = 1000				 # Regularization Parameter
-noiseRadiance = 0.00 		 # Noise to radiance ratio
-noiseSource = 0.00           # Noise to source ratio
+noiseRadiance = 0   	     # Noise to radiance ratio
+noiseSource = 0 	         # Noise to source ratio
 radiusToImageRatio = 0.25	 # Radius to Image dimensions ratio
 sphereImageSize = 50         # Radius of the spehere to be rendered
 soslimit = 1000				 # No of iters for Shape from Shading
@@ -152,14 +152,15 @@ print('=====> Finished Depth Retrieval')
 #######################################################
 # Visualization of the Depth
 #######################################################
+filename = 'r_' + str(sphereImageSize) + 'nr_' + str(int(noiseRadiance)) + 'ns_' + str(int(noiseSource)) + 'lambda_' + str(Lambda) + '_pq'
 plt.imshow(Z_estimated)
+plt.savefig('results/pq/2d/' + filename)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.set_xlim3d(0,sphereImageSize)
 ax.set_ylim3d(0,sphereImageSize)
 ax.set_zlim3d(0,sphereImageSize)
-filename = 'r_' + str(sphereImageSize) + 'nr_' + str(noiseRadiance) + 'ns_' + str(noiseSource) + 'lambda_' + str(Lambda) + '_pq'
-np.save('results/' + filename ,Z_estimated)
+np.save('results/pq/3d/' + filename ,Z_estimated)
 surf = ax.plot_surface(rows, cols, Z_estimated, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=1, aspect=5)
 plt.show()

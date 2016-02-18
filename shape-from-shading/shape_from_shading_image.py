@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+from tqdm import *
 
 #######################################################
 # Parameter Definition
@@ -13,13 +14,15 @@ Lambda = 100				# Regularization Parameter
 noiseSNR = 5; 				# Noise to signal ratio
 radiusToImageRatio = 0.25	# Radius to Image dimensions ratio
 sphereImageSize = 75   # Radius of the spehere to be rendered
-
+depthlimit = 5000
+shadingLimit = 5000
 
 #######################################################
 # Detecting Boundary using Morphological Operations from OpenCV
 #######################################################
 
-rad = cv2.imread('im2.JPG')
+inputImage = 'input/im5.JPG'
+rad = cv2.imread(inputImage)
 rad = cv2.cvtColor(rad, cv2.COLOR_RGB2GRAY)
 rad = cv2.resize(rad,None,fx=0.05,fy=0.05,interpolation=cv2.INTER_CUBIC)
 radiance = np.asarray(rad)
@@ -58,12 +61,10 @@ qBoundary = qBoundary - qBoundary * (1 - boundaryMap)
 #######################################################
 # Iterative Shape from shading
 #######################################################
-limit = 5000
 p_next,q_next = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)
 p_estimated,q_estimated = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)	
 
-for iteration in range(0,limit):
-	print('Starting Iteration :', iteration+1)
+for iteration in tqdm(range(0,shadingLimit)):
 	for i in range(1,pBoundary.shape[0] -1):
 		for j in range(1,pBoundary.shape[1] -1):
 			if regionOfInterestRadiance[i][j] == 1 :
@@ -81,13 +82,12 @@ for iteration in range(0,limit):
 #######################################################
 # Depth Retrieval 
 #######################################################
-limit = 5000
 Z_p   = np.zeros(p_estimated.shape)
 Z     = np.zeros(p_estimated.shape)
 p_x,q_y = np.array(p_estimated,copy=True),np.array(q_estimated,copy=True)
 p_x[:][1:-1] = ( p_estimated[:][2:] - p_estimated[:][:-2]);
 q_y[1:-1][:] = ( q_estimated[:-2][:] - q_estimated[2:][:]);
-for iteration in range(0,limit):
+for iteration in range(0,depthlimit):
 	for i in range(1,p_estimated.shape[0]-1):
 		for j in range(1,p_estimated.shape[1]-1):
 			if regionOfInterestRadiance[i][j] == 1 :
@@ -109,6 +109,7 @@ print(np.amin(radiance))
 #######################################################
 
 plt.imshow(Z_estimated)
+plt.savefig('results/pq/depth_images/' + inputImage[6:-4] + 'depthMap.png')
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 # ax.set_xlim3d(0,sphereImageSize)

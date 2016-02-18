@@ -6,15 +6,12 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from tqdm import *
 
-def changeParams(param1, param2, sourceParamType):
+def transformParam(param1, param2, sourceParamType):
     if sourceParamType == 'pq':
         p = np.array(param1,copy=True)
         q = np.array(param2,copy=True) 
         if param1.shape[0] > 1:
             tanPQ = (p**2 + q**2)**(0.5)
-            # plt.imshow(tanPQ)
-            # print np.amax(param1)
-            # tanFG = np.tan(0.5*np.arctan(tanPQ))
             f = 2*p/(1 + (1+ p**2 + q**2)**(0.5) )
             g = 2*q/(1 + (1+ p**2 + q**2)**(0.5) )
             return f,g
@@ -42,13 +39,12 @@ def changeParams(param1, param2, sourceParamType):
 #######################################################
 # Parameter Definition
 #######################################################
-source = [0,0,1] 			# Coordinate of Light Source
-Lambda = 100				# Regularization Parameter
-noiseSNR = 5; 				# Noise to signal ratio
-noiseRadiance = 0.00 		 # Noise to radiance ratio
-noiseSource = 0.01           # Noise to source ratio
-radiusToImageRatio = 0.25	# Radius to Image dimensions ratio
-sphereImageSize = 100   # Radius of the spehere to be rendered
+source = [0,0,1] 			 # Coordinate of Light Source
+Lambda = 1000  				 # Regularization Parameter
+noiseRadiance = 0	 		 # Noise to radiance ratio
+noiseSource = 0              # Noise to source ratio
+radiusToImageRatio = 0.25	 # Radius to Image dimensions ratio
+sphereImageSize = 50         # Radius of the spehere to be rendered
 soslimit = 1000				 # No of iters for Shape from Shading
 depthlimit = 1000			 # No of iters for depth retrieval
 
@@ -57,7 +53,7 @@ depthlimit = 1000			 # No of iters for depth retrieval
 #######################################################
 print('=====> Starting Sphere Rendering')
 depthMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
-clippingMap         = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
+clippingMap      = np.zeros((sphereImageSize,sphereImageSize))                     # Array to store depth (z) values
 regionOfInterest = np.zeros((sphereImageSize,sphereImageSize))                     # Boolean flag to mark the sphere ROI
 radius           = radiusToImageRatio * sphereImageSize                            # Radius of the sphere
 clippingRadius   = radius * 0.95
@@ -148,7 +144,7 @@ gradY[1:-1][:]     = (  gradY[:-2][:]  - gradY[2:][:] ) * 0.5
 # gradX = gradX * boundaryMap.astype(bool)
 # gradY = gradY * boundaryMap.astype(bool)
 
-f,g = changeParams(gradX,gradY,'pq')
+f,g = transformParam(gradX,gradY,'pq')
 # f,g = gradX, gradY
 
 #f,g = f * intersectionROI , g * intersectionROI
@@ -189,7 +185,7 @@ for iteration in tqdm(range(0,soslimit)):
 	p_estimated = (p_next*regionOfInterestRadiance*(1-boundaryMap.astype(bool))) + pBoundary*boundaryMap*regionOfInterestRadiance
 	q_estimated = (q_next*regionOfInterestRadiance*(1-boundaryMap.astype(bool))) + qBoundary*boundaryMap*regionOfInterestRadiance
 
-p_est, q_est = changeParams(p_estimated, q_estimated, 'fg')
+p_est, q_est = transformParam(p_estimated, q_estimated, 'fg')
 p_estimated = p_est# * (p_est<2)
 q_estimated = q_est# * (q_est<2)
 
@@ -226,14 +222,15 @@ print('=====> Finished Depth Retrieval')
 #######################################################
 # Visualization of the Depth
 #######################################################
+filename = 'r_' + str(sphereImageSize) + 'nr_' + str(int(noiseRadiance)) + 'ns_' + str(int(noiseSource)) + 'lambda_' + str(Lambda) + '_fg'
 plt.imshow(Z_estimated)
+plt.savefig('results/fg/2d/' + filename)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.set_xlim3d(0,sphereImageSize)
 ax.set_ylim3d(0,sphereImageSize)
 ax.set_zlim3d(0,sphereImageSize)
 surf = ax.plot_surface(rows, cols, Z_estimated, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-filename = 'r_' + str(sphereImageSize) + 'nr_' + str(noiseRadiance) + 'ns_' + str(noiseSource) + 'lambda_' + str(Lambda) + 'fg'
-np.save('results/' + filename ,Z_estimated)
+np.save('results/fg/3d/' + filename ,Z_estimated)
 fig.colorbar(surf, shrink=1, aspect=5)
 plt.show()
