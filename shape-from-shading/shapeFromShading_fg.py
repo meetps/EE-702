@@ -41,7 +41,7 @@ def transformParam(param1, param2, sourceParamType):
 #######################################################
 source = [0,0,1] 			 # Coordinate of Light Source
 Lambda = 1000  				 # Regularization Parameter
-noiseRadiance = 0	 		 # Noise to radiance ratio
+noiseRadiance = 5	 		 # Noise to radiance ratio
 noiseSource = 0              # Noise to source ratio
 radiusToImageRatio = 0.25	 # Radius to Image dimensions ratio
 sphereImageSize = 50         # Radius of the spehere to be rendered
@@ -91,6 +91,7 @@ for i in range(1,sphereImageSize-1):
 		q[i][j] = depthMap[i][j] - depthMap[i-1][j]  
 
 p,q = p * regionOfInterest, q * regionOfInterest
+source = source + np.random.normal(0,1,3)*noiseSource
 
 #######################################################
 # Calculating the image radiance from gradient fields
@@ -129,7 +130,6 @@ p,q = p * intersectionROI , q * intersectionROI
 noiseR = np.random.normal(0,1,sphereImageSize*sphereImageSize)
 noiseR = noiseR.reshape(sphereImageSize,sphereImageSize)*noiseRadiance
 radiance = radiance + noiseR
-source = source + np.random.normal(0,1,3)*noiseSource
 
 
 #######################################################
@@ -161,6 +161,8 @@ print('=====> Starting Iterative Shape from shading')
 #######################################################
 # Iterative Shape from shading
 #######################################################
+source = [0,0,1]
+
 limit = 1000
 p_next,q_next = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)
 p_estimated,q_estimated = np.array(pBoundary,copy=True),np.array(qBoundary,copy=True)	
@@ -222,7 +224,7 @@ print('=====> Finished Depth Retrieval')
 #######################################################
 # Visualization of the Depth
 #######################################################
-filename = 'r_' + str(sphereImageSize) + 'nr_' + str(int(noiseRadiance)) + 'ns_' + str(int(noiseSource)) + 'lambda_' + str(Lambda) + '_fg'
+filename = 'r_' + str(sphereImageSize) + 'nr_' + str(int(noiseRadiance)) + 'ns_' + str(int(noiseSource*10)) + 'lambda_' + str(Lambda) + '_fg'
 plt.imshow(Z_estimated)
 plt.savefig('results/fg/2d/' + filename)
 fig = plt.figure()
