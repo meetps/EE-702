@@ -11,19 +11,19 @@ def stereo_match(left_img, right_img):
 
     # Initial squared differences
     w, h = left_img.size  # Assumes that both images are same size
-    sd = np.empty((w, h), np.uint8)
+    sd = np.empty((w, h), np.uint32)
     sd.shape = h, w
 
     # SSD support window (kernel)
-    win_ssd = np.empty((w, h), np.uint16)
+    win_ssd = np.empty((w, h), np.uint32)
     win_ssd.shape = h, w
 	
     # Depth (or disparity) map
-    depth = np.empty((w, h), np.uint8)
+    depth = np.empty((w, h), np.uint32)
     depth.shape = h, w
 
     # Minimum ssd difference between both images
-    min_ssd = np.empty((w, h), np.uint16)
+    min_ssd = np.empty((w, h), np.uint32)
     min_ssd.shape = h, w
     for y in range(h):
         for x in range(w):
@@ -46,7 +46,7 @@ def stereo_match(left_img, right_img):
         for y in y_range:
             for x in x_range_ssd:
                 if x - offset > 0:
-                    diff = left[y, x, 0] - right[y, x - offset, 0]
+                    diff = left[y, x] - right[y, x - offset]
                     sd[y, x] = diff * diff
 
 		# Create a sum of squared differences over a support window at this offset
@@ -79,4 +79,4 @@ def stereo_match(left_img, right_img):
 
 if __name__ == '__main__':
     #stereo_match("bowling_small_l.png", "bowling_small_r.png")
-    stereo_match("view0.png", "view1.png")
+    stereo_match("tsukubaright.jpg", "tsukubaleft.jpg")

@@ -29,7 +29,7 @@ def stereo_match(left_img, right_img):
         for x in range(w):
             min_ssd[y, x] = 65535  # Init to high value
 
-    max_offset = 100
+    max_offset = 30
     offset_adjust = 255 / max_offset  # used to brighten depth map
 
     # Create ranges now instead of per loop
