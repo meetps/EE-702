@@ -30,8 +30,8 @@ def corr2(a,b):
     return r
 
 def load_image( infilename ) :
-	img = cv2.imread(infilename,0)
-	data = np.asarray(img, dtype='double')
+	rgbimg = cv2.imread(infilename,0)
+	data = np.asarray(rgbimg, dtype='double')
 	return data
 
 def save_image( npdata, outfilename ) :
@@ -56,19 +56,25 @@ def postProcessDepth(depthMap, edgeRight, height, width,type, iters):
 
 def getDepthMap(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize , minOffset, maxOffset, matchType ):
 	height,width = rightImage.shape[0],leftImage.shape[1]
-	disparityMap = np.zeros((height,width),dtype='double')
-	disparityMask = np.zeros((height,width),dtype='double')
+	disparityMap = np.zeros((height,width))
+	disparityMask = np.zeros((height,width))
 	windowSize = (corrWindowSize-1)/2
-	windowRange = [i for i in range(-windowSize,windowSize) ]
-	for i in tqdm(range(windowSize, height - windowSize-1)):
+	for i in tqdm(range(windowSize, height - windowSize)):
 	# for i in tqdm(range(windowSize, windowSize+1)):
-		for j in range(windowSize,width - windowSize-1):
+		for j in range(windowSize,width - windowSize):
 			if(edgeRight[i][j]):
-				patchValLeft = rightImage[i+windowSize][i+windowSize] / np.sum(rightImage[i+windowSize][j+windowSize] * rightImage[i+windowSize][j+windowSize])**(0.5)
-				patchValRight = leftImage[i+windowSize][i+windowSize] / np.sum(leftImage[i+windowSize][j+windowSize] * leftImage[i+windowSize][j+windowSize])**(0.5)
+				patchSumRight = np.sum(rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
+				patchSumLeft = np.sum(leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
+				patchValLeft = np.array(rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] / patchSumLeft,copy=True)
+				patchValRight = np.array(leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] / patchSumRight,copy=True)
+				# print rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize].shape
+				# print leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize].shape
+				print j 
+				print i
+				print windowSize
 				maxCorr = corr2(patchValRight,patchValLeft)
-				for k in range(j,width-windowSize-2):
-					newPatchValLeft = leftImage[i+windowSize][k+windowSize] / np.sum(leftImage[i+windowSize][k+windowSize] * leftImage[i+windowSize][k+windowSize])**(0.5)
+				for k in range(j,width-windowSize-1):
+					newPatchValLeft = leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize] / np.sum(leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize] * leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize])**(0.5)
 					Corr = corr2(patchValRight,newPatchValLeft)
 					if(maxCorr < Corr):
 						maxCorr = Corr
@@ -77,7 +83,7 @@ def getDepthMap(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize , minO
 				disparityMask[i][j]	= 1
 				if(maxCorr < 0.7 or disparityMap[i][j] > maxOffset):
 					disparityMap[i][j] = 0
-					edgeRight[i][j] = 0
+					# edgeRight[i][j] = 0
 					disparityMask[i][j] = 0
 			else:
 				disparityMask[i][j]	= 0
@@ -86,17 +92,23 @@ def getDepthMap(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize , minO
 if __name__ == "__main__":
 	rightImage = load_image(RIGHT_IMAGE)
 	leftImage = load_image(LEFT_IMAGE)
-		
+	
 	height,width = rightImage.shape[0],leftImage.shape[1]
 
-	filteredRightImage = preProcessImage(rightImage,'gaussian',0.1)
-	filteredLeftImage = preProcessImage(rightImage,'gaussian',0.1)
-
+	filteredRightImage = preProcessImage(rightImage,'gaussian',1)
+	filteredLeftImage = preProcessImage(rightImage,'gaussian',1)
+	
 	edgeRight = cv2.Canny(rightImage.astype(dtype=np.uint8),100,200)
 	edgeLeft = cv2.Canny(leftImage.astype(dtype=np.uint8),100,200)
 
-	depthMap, depthMask = getDepthMap(filteredRightImage,filteredLeftImage,edgeLeft,edgeRight,9,0,16,'SSD')
+	
+
+	depthMap, depthMask = getDepthMap(filteredRightImage,filteredLeftImage,edgeLeft,edgeRight,19,0,16,'SSD')
+	
+	imgplot = plt.imshow(depthMap)
+	plt.show()
+
 	filteredDepth = postProcessDepth(depthMap, height, width, edgeRight, 1, 2000)
 	imageDepth  = filteredDepth.astype(np.uint8)
-	imgplot = plt.imshow(imageDepth,cmap="hot")
+	imgplot = plt.imshow(depthMap,cmap="hot")
 	plt.show()
