@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 from tqdm import  *
 
 HOME_PATH = "/home/meetshah1995/Desktop/Dropbox/Third_Year/II/EE702-Computer_Vision/EE-702/stereo-vision/data/"
-data_dirs = ['Aloe', 'Baby1', 'Baby2', 'Baby3', 'Bowling1', 'Bowling2', 'Cloth1', 'Cloth2', 'Cloth3', 'Cloth4', 'Flowerpots', 'Lampshade1', 'Lampshade2', 'Midd1', 'Midd2', 'Monopoly', 'Plastic', 'Rocks1', 'Rocks2', 'Wood1', 'Wood2']
+# data_dirs = ['Baby1', 'Baby2', 'Baby3', 'Bowling1', 'Bowling2', 'Cloth1', 'Cloth2', 'Cloth3', 'Cloth4', 'Flowerpots', 'Lampshade1', 'Lampshade2', 'Midd1', 'Midd2', 'Monopoly', 'Plastic', 'Rocks1', 'Rocks2', 'Wood1', 'Wood2']
+data_dirs = ['Wood2']
 
-def stereoMatchSSD(left_img, right_img):
+def stereoMatchSSD(left_img, right_img,directory):
     left_img = Image.open(left_img)
     left = np.asarray(left_img)
     right_img = Image.open(right_img)
@@ -64,4 +65,5 @@ if __name__ == '__main__':
     for directory in data_dirs:
         imageleft = HOME_PATH + directory + '/view0.png'
         imageright = HOME_PATH + directory + '/view1.png'
-        stereoMatchSSD("view0.png", "view1.png")
+        print imageright
+        stereoMatchSSD(imageleft, imageright,directory)
