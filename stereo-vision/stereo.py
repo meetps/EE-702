@@ -19,6 +19,12 @@ flow :
 '''
 
 data_directories = ["Aloe"]
+
+def getWindow(arr,x,y,windowSize):
+    ''' Given a 2D-array, returns an nxn array whose "center" element is arr[x,y]'''
+    arr=np.roll(np.roll(arr,shift=-x+1,axis=0),shift=-y+1,axis=1)
+    return arr[:windowSize,:windowSize]
+
 def mean2(x):
     y = np.sum(x) / np.size(x);
     return y
@@ -61,20 +67,23 @@ def getDepthMap(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize , minO
 	windowSize = (corrWindowSize-1)/2
 	for i in tqdm(range(windowSize, height - windowSize)):
 	# for i in tqdm(range(windowSize, windowSize+1)):
+		# print i
 		for j in range(windowSize,width - windowSize):
 			if(edgeRight[i][j]):
 				patchSumRight = np.sum(rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
 				patchSumLeft = np.sum(leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
-				patchValLeft = np.array(rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] / patchSumLeft,copy=True)
-				patchValRight = np.array(leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] / patchSumRight,copy=True)
+				patchValLeft = getWindow(rightImage,i,j,windowSize) / patchSumLeft
+				patchValRight = getWindow(leftImage,i,j,windowSize) / patchSumRight
 				# print rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize].shape
 				# print leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize].shape
-				print j 
-				print i
-				print windowSize
+				# print j 
+				# print i
+				# print getWindow(rightImage,i,j,windowSize).shape
+				# print getWindow(leftImage,i,j,windowSize).shape
 				maxCorr = corr2(patchValRight,patchValLeft)
 				for k in range(j,width-windowSize-1):
-					newPatchValLeft = leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize] / np.sum(leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize] * leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize])**(0.5)
+					newPatchSumLeft =  np.sum(leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize] * leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize])**(0.5)
+					newPatchValLeft = getWindow(leftImage,i,k,windowSize) / newPatchSumLeft
 					Corr = corr2(patchValRight,newPatchValLeft)
 					if(maxCorr < Corr):
 						maxCorr = Corr
@@ -100,8 +109,6 @@ if __name__ == "__main__":
 	
 	edgeRight = cv2.Canny(rightImage.astype(dtype=np.uint8),100,200)
 	edgeLeft = cv2.Canny(leftImage.astype(dtype=np.uint8),100,200)
-
-	
 
 	depthMap, depthMask = getDepthMap(filteredRightImage,filteredLeftImage,edgeLeft,edgeRight,19,0,16,'SSD')
 	
