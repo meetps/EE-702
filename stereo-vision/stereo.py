@@ -59,6 +59,22 @@ def postProcessDepth(depthMap, edgeRight, height, width,type, iters):
 		depthMap = filteredDepth
 	return filteredDepth
 
+def getNCC(rightImage,leftImage,i,j,windowSize):
+	nElements = windowSize**2
+	meanL,meanR,crossCumSum,cummSumR,cummSumL = 0.0,0.0,0.0,0.0,0.0
+	for m in range(i-windowSize,i+windowSize):
+		for n in range(j-windowSize,j+windowSize):
+			meanR += rightImage[m][n] / nElements 
+			meanL += leftImage[m][n] / nElements 
+
+	for m in range(i-windowSize,i+windowSize):
+		for n in range(j-windowSize,j+windowSize):
+			cummSumR += (rightImage[m][n] - meanR)**2
+			cummSumL += (leftImage[m][n] -  meanL)**2
+			crossCumSum += (rightImage[m][n] - meanR)*(leftImage[m][n] -  meanL)
+
+	return crossCumSum / math.sqrt(cummSumR * cummSumL)
+
 
 def getDepthMap(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize , minOffset, maxOffset, matchType ):
 	height,width = rightImage.shape[0],leftImage.shape[1]
@@ -70,21 +86,25 @@ def getDepthMap(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize , minO
 		# print i
 		for j in range(windowSize,width - windowSize):
 			if(edgeRight[i][j]):
-				patchSumRight = np.sum(rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
-				patchSumLeft = np.sum(leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
-				patchValLeft = getWindow(rightImage,i,j,windowSize) / patchSumLeft
-				patchValRight = getWindow(leftImage,i,j,windowSize) / patchSumRight
+				# patchSumRight = np.sum(rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
+				# patchSumLeft = np.sum(leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize] * leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize])**(0.5)
+				
+				# patchSumRight = getSum(rightImage i,j,windowSize)
+				# patchSumLeft = getSum(leftImage i,j,windowSize)
+				# patchValLeft = getWindow(rightImage,i,j,windowSize) / patchSumLeft
+				# patchValRight = getWindow(leftImage,i,j,windowSize) / patchSumRight
 				# print rightImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize].shape
 				# print leftImage[i-windowSize:i+windowSize][j-windowSize:j+windowSize].shape
 				# print j 
 				# print i
 				# print getWindow(rightImage,i,j,windowSize).shape
 				# print getWindow(leftImage,i,j,windowSize).shape
-				maxCorr = corr2(patchValRight,patchValLeft)
+				# maxCorr = corr2(patchValRight,patchValLeft)
+				maxCorr = getNCC(rightImage,leftImage,i,j,windowSize)
 				for k in range(j,width-windowSize-1):
-					newPatchSumLeft =  np.sum(leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize] * leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize])**(0.5)
-					newPatchValLeft = getWindow(leftImage,i,k,windowSize) / newPatchSumLeft
-					Corr = corr2(patchValRight,newPatchValLeft)
+					# newPatchSumLeft =  np.sum(leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize] * leftImage[i-windowSize:i+windowSize][k-windowSize:k+windowSize])**(0.5)
+					# newPatchValLeft = getWindow(leftImage,i,k,windowSize) / newPatchSumLeft
+					Corr = getNCC(rightImage,leftImage,i,k,windowSize)
 					if(maxCorr < Corr):
 						maxCorr = Corr
 						disparityMap[i][j] = k-j
