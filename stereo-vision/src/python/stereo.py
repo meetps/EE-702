@@ -1,4 +1,3 @@
-import Image
 import numpy as np
 import cv2
 import math
@@ -37,7 +36,8 @@ def corr2(a,b):
 
 def load_image( infilename ) :
 	rgbimg = cv2.imread(infilename,0)
-	data = np.asarray(rgbimg, dtype='double')
+	res = cv2.resize(rgbimg,None,fx=0.5, fy=0.5, interpolation = cv2.INTER_CUBIC)
+	data = np.asarray(res, dtype='double')
 	return data
 
 def save_image( npdata, outfilename ) :
@@ -110,7 +110,8 @@ def getDepthMap(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize , minO
 						disparityMap[i][j] = k-j
 
 				disparityMask[i][j]	= 1
-				if(maxCorr < 0.7 or disparityMap[i][j] > maxOffset):
+				# if(maxCorr < 0.7 or disparityMap[i][j] > maxOffset):
+				if(disparityMap[i][j] > maxOffset):
 					disparityMap[i][j] = 0
 					# edgeRight[i][j] = 0
 					disparityMask[i][j] = 0
@@ -124,18 +125,26 @@ if __name__ == "__main__":
 	
 	height,width = rightImage.shape[0],leftImage.shape[1]
 
-	filteredRightImage = preProcessImage(rightImage,'gaussian',1)
-	filteredLeftImage = preProcessImage(rightImage,'gaussian',1)
+	filteredRightImage = preProcessImage(rightImage,'gaussian',0.1)
+	filteredLeftImage = preProcessImage(leftImage,'gaussian',0.1)
 	
-	edgeRight = cv2.Canny(rightImage.astype(dtype=np.uint8),100,200)
-	edgeLeft = cv2.Canny(leftImage.astype(dtype=np.uint8),100,200)
+	edgeRight = cv2.Canny(rightImage.astype(dtype=np.uint8),120,250)
+	edgeLeft = cv2.Canny(leftImage.astype(dtype=np.uint8),120,250)
 
-	depthMap, depthMask = getDepthMap(filteredRightImage,filteredLeftImage,edgeLeft,edgeRight,19,0,16,'SSD')
+	imgplot = plt.imshow(edgeRight)
+	plt.show()
+
+	print(">>>>>>>>> Retrieving Depth ... ")
+
+	depthMap, depthMask = getDepthMap(filteredRightImage,filteredLeftImage,edgeLeft,edgeRight,19,0,30,'SSD')
 	
+	# cv2.imshow(depthMap)
+
 	imgplot = plt.imshow(depthMap)
 	plt.show()
 
+	print(">>>>>>>>> InterPolating Depth ... ")
 	filteredDepth = postProcessDepth(depthMap, height, width, edgeRight, 1, 2000)
 	imageDepth  = filteredDepth.astype(np.uint8)
-	imgplot = plt.imshow(depthMap,cmap="hot")
+	imgplot = plt.imshow(filteredDepth,cmap="hot")
 	plt.show()
