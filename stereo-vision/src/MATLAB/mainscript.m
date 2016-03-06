@@ -10,9 +10,9 @@ edgeLeft = edge(leftImage, 'canny',0.01);
 
 maxDisparity = 60;
 minDisparity = 0;
-corrWindowSize = 25;
+corrWindowSize = 19;
 
 [ depthMap, disparityMask ] = stereoMatch(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize, minDisparity, maxDisparity, 'NCC'); 
 imshow(depthMap,[])
-finalDepth  = postprocessDepth(depthMap,2000,edgeRight);
+finalDepth  = postProcessDepth(depthMap,2000,edgeRight);
 imshow(finalDepth,[])

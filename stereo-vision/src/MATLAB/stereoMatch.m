@@ -28,7 +28,7 @@ function  [disparityMap, disparityMask ] = stereoMatch(rightImage,leftImage, edg
 			end
 		end
 	%disp(num2str(i))	
-	waitbar(i/ height-windowSize);
+	waitbar(i/height)
 	end
-	close(h)
+	close(h);
 end	
