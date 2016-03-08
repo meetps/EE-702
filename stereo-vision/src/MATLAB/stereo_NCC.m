@@ -25,10 +25,6 @@ function disparityMap = stereo_NCC(leftImage, rightImage, maxDisparity)
             offset = minDisparity;
             for dispRange = minDisparity:maxDisparity,
                 Correl = 0.0;
-                nccNumerator = 0.0;
-                nccDenominator = 0.0;
-                nccDenominatorRightwinRangedow = 0.0;
-                nccDenominatorLeftwinRangedow = 0.0;
                 t = -winRange:winRange;
 
                 dotLeftRight = sum(sum(rightImage(i+t,j+t).*leftImage(i+t,j+t+dispRange)));
