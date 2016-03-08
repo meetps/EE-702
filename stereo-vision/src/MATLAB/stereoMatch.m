@@ -1,4 +1,4 @@
-function  [disparityMap, disparityMask ] = stereoMatch(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize, minOffset, maxOffset, matchType)
+function  [disparityMap, disparityMask] = stereoMatch(rightImage,leftImage, edgeRight, edgeLeft, corrWindowSize, minOffset, maxOffset, matchType)
 	[ height,width ] = size(rightImage);
 	disparityMap = zeros(height,width);
 	disparityMask = zeros(height,width);
@@ -8,17 +8,17 @@ function  [disparityMap, disparityMask ] = stereoMatch(rightImage,leftImage, edg
 	for i = 1 + windowSize:height - windowSize,
 		for j = 1 + windowSize:width - windowSize,
 			if(edgeRight(i,j))
-				maxCorr = getNCC(rightImage,leftImage,i,j,windowRange);
+				maxCorr = getNCC(rightImage,leftImage,i,j,j,windowRange);
 				for k=j+1:width-windowSize-1,
-					Corr = getNCC(rightImage,leftImage,i,k,windowRange);
+					Corr = getNCC(rightImage,leftImage,i,j,k,windowRange);
 					if(maxCorr < Corr)
-						maxCorr = Corr;
 						disparityMap(i,j) = k-j;
+						maxCorr = Corr;
 					end
 				end
 				disparityMask(i,j)	= 1;
 				%if( or disparityMap(i,j) > maxOffset):
-				if(maxCorr < 0.7 || disparityMap(i,j) > maxOffset)
+				if(maxCorr < 0.70 || disparityMap(i,j) > maxOffset)
 					disparityMap(i,j) = 0;
 					edgeRight(i,j) = 0;
 					disparityMask(i,j) = 0;

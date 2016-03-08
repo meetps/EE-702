@@ -1,5 +1,5 @@
 function [filteredDepth] = postProcessDepth(depthMap,iters,edgeRight)
-	filteredDepth = zeros(size(depthMap));
+	filteredDepth = depthMap;
 	for k=1:iters,
 		for i=2:size(depthMap,1)-1,
 			for j=2:size(depthMap,2)-1,
