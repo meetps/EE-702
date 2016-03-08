@@ -29,7 +29,7 @@ def stereo_match(left_img, right_img):
         for x in range(w):
             min_ssd[y, x] = 65535  # Init to high value
 
-    max_offset = 100
+    max_offset = 15
     offset_adjust = 255 / max_offset  # used to brighten depth map
 
     # Create ranges now instead of per loop
@@ -46,8 +46,9 @@ def stereo_match(left_img, right_img):
         for y in y_range:
             for x in x_range_ssd:
                 if x - offset > 0:
-                    diff = left[y, x, 0] - right[y, x - offset, 0]
-                    sd[y, x] = abs(diff)
+                    sd[y, x] = abs(left[y, x, 0] - right[y, x - offset, 0])
+                    # diff = left[y, x, 0] - right[y, x - offset, 0]
+                    # sd[y, x] = abs(diff)
 
 		# Create a sum of squared differences over a support window at this offset
         for y in y_range:
@@ -74,9 +75,9 @@ def stereo_match(left_img, right_img):
         print("Calculated offset ", offset)
 
     # Convert to PIL and save it
-    Image.fromarray(depth).save('depth_SAD.png')
+    Image.fromarray(depth).save('depth_SAD_wood.png')
 
 
 if __name__ == '__main__':
     #stereo_match("bowling_small_l.png", "bowling_small_r.png")
-    stereo_match("view0.png", "view1.png")
+    stereo_match("disp0.png", "disp1.png")
