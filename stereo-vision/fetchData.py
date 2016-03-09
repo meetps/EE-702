@@ -23,6 +23,9 @@ for a in soup.findAll('a'):
   else:
     pass
 
+os.system("mkdir data")
+os.system("mv '*.zip' data/")
+os.system("cd data")
 os.system("unzip '*.zip'")
-os.system("rm *.zip")
+os.system("rm '*.zip'")
 # print links
