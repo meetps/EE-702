@@ -8,7 +8,9 @@ directory_list = dir('../../data/');
 rightView  = 'view1.png';
 leftView  = 'view0.png';
 
-for i=3:size(directory_list),
+maxOffset = 16;
+
+for i=4:size(directory_list),
 	folder_path = strcat([data_path directory_list(i).name '/'])
 	rightImage = imread(strcat([folder_path rightView ])); 
 	leftImage = imread(strcat([folder_path leftView ]));
@@ -20,4 +22,5 @@ for i=3:size(directory_list),
 	imwrite(mat2gray(depth_NCC),strcat([folder_path 'depthNCC.png' ]));
 	imwrite(mat2gray(depth_SAD),strcat([folder_path 'depthSAD.png' ]));
 	imwrite(mat2gray(depth_SSD),strcat([folder_path 'depthSSD.png' ]));
+	close all;
 end
