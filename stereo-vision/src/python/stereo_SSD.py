@@ -3,7 +3,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from tqdm import  *
 
-HOME_PATH = "/home/meetshah1995/Desktop/Dropbox/Third_Year/II/EE702-Computer_Vision/EE-702/stereo-vision/data/"
+HOME_PATH = "/home/yash/EE-702/stereo-vision/data/"
 # data_dirs = ['Baby1', 'Baby2', 'Baby3', 'Bowling1', 'Bowling2', 'Cloth1', 'Cloth2', 'Cloth3', 'Cloth4', 'Flowerpots', 'Lampshade1', 'Lampshade2', 'Midd1', 'Midd2', 'Monopoly', 'Plastic', 'Rocks1', 'Rocks2', 'Wood1', 'Wood2']
 data_dirs = ['Wood2']
 
