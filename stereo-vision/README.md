@@ -30,7 +30,9 @@ The result files for each image in the dataset has been saved in the individual 
 * depthSAD.png
 * depthNCC.png
 * depthSSD.png
-* depthMultiOccular.png
+* depthMultiOccularNCC.png
+* depthMultiOccularSAD.png
+* depthMultiOccularSSD.png
 
 #### Observations:
 
@@ -44,10 +46,10 @@ The result files for each image in the dataset has been saved in the individual 
 * NCC seems to perform better on almost the entire dataset and can be seen as a more general pixel similarity measure for stereo vision. Since NCC calculates the normalized cross correlation, it seems to overcome the shortcomings of SSD (unsigned measure) and SAD (prone to intensity variations and spikes). It is computationally expensive and does not detect discontinuities as accurately as SAD and similarities as accurately as SSD. This can be avoided by using semi-global optimization as suggested by Hirschmuller et. al.
  
 ##### General Issues 
-Since the patch matching uses pixel similarity, it becomes almost impossible to distuinguish between patches that have almost the same texture besides having very little differences in depth.This patches lead to convolved zero-boundary features on the texture plane as observed in many result images having planes with similar textures. These iso-depth and iso-color contours lead to patches in the disparity.A lucid explanation of the same can be that : since all patches in the neighbourhood look the same (i.e. have the same cost matching) the algorithm fails to identify the corresponding right patch for a left patch and hence the it leads to random disparity values for textures with same depth and same color/texture.
+* Since the patch matching uses pixel similarity, it becomes almost impossible to distuinguish between patches that have almost the same texture besides having very little differences in depth.This patches lead to convolved zero-boundary features on the texture plane as observed in many result images having planes with similar textures. These iso-depth and iso-color contours lead to patches in the disparity.A lucid explanation of the same can be that : since all patches in the neighbourhood look the same (i.e. have the same cost matching) the algorithm fails to identify the corresponding right patch for a left patch and hence the it leads to random disparity values for textures with same depth and same color/texture.
 
 ##### Multi-occular
 * In using multiple images for depth estimation, the accuracy goes up as we have more data to estimate the depth and the false positive values and matches are reduced significantly.We look at the image from a larger field of view (4 images covering almost 120 degrees) and hence the occluded regions in the object in the image reduce significantly and hence we have lesser patches/pixels whose disparity has to be estimated from the neighbourhood.
  
 #### Future Work 
-* A lot of algorithms using dynamic programming, semi-global matching, scaled transformations and convolutional neural networks are being deployed to solve the stereo problem. I also reviewed a similar paper on the Application of convolutional neural networks for stereo matching which can be found (here)[https://github.com/meetshah1995/EE-702/blob/master/paper-review/ee702_13d070003_paper_review.pdf].
+* A lot of algorithms using dynamic programming, semi-global matching, scaled transformations and convolutional neural networks are being deployed to solve the stereo problem. I also reviewed a similar paper on the Application of convolutional neural networks for stereo matching which can be found [here](https://github.com/meetshah1995/EE-702/blob/master/paper-review/ee702_13d070003_paper_review.pdf).
