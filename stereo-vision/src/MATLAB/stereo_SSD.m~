@@ -1,4 +1,4 @@
-function disparityMap = stereo_SAD(leftImage, rightImage, maxDisparity)
+function disparityMap = stereo_SSD(leftImage, rightImage, maxDisparity)
     
     if(size(leftImage,3)==3)
         leftImage = rgb2gray(leftImage);
@@ -21,17 +21,17 @@ function disparityMap = stereo_SAD(leftImage, rightImage, maxDisparity)
     
     for i = 1+winRange:height-winRange,
         for j = 1+winRange:width-winRange-maxDisparity,
-            minSAD = 65535;
+            minssd = 65535;
             temp=0.0;
             offset = minDisparity;
             for dispRange = minDisparity:maxDisparity,
-                sad=0.0;
+                ssd=0.0;
                 t = -winRange:winRange;
                 if (j+winRange+dispRange <= width)
-                    sad=sum(sum(abs(rightImage(i+t,j+t)-leftImage(i+t,j+t+dispRange))));
+                    ssd = sum(sum(rightImage(i+t,j+t)-leftImage(i+t,j+t+dispRange)).^2));
                 end
-                if (minSAD > sad)
-                    minSAD = sad;
+                if (minssd > ssd)
+                    minssd = ssd;
                     offset = dispRange;
                 end
             end

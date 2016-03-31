@@ -12,10 +12,10 @@ function disparityMap = stereo_SSD(leftImage, rightImage, maxDisparity)
     leftImage = double(leftImage);
     rightImage = double(rightImage);
     
-    winRangedowSize = 15;
+    winRangedowSize = 7;
     winRange = (winRangedowSize-1)/2;
 
-    minDisparity = 0.0;
+    minDisparity = 0;
 
     disparityMap = zeros(height, width);
     
@@ -28,7 +28,9 @@ function disparityMap = stereo_SSD(leftImage, rightImage, maxDisparity)
                 ssd=0.0;
                 t = -winRange:winRange;
                 if (j+winRange+dispRange <= width)
-                    ssd=sum(sum((rightImage(i+t,j+t)-leftImage(i+t,j+t+dispRange)).^2));
+                    temp = rightImage(i+t,j+t)-leftImage(i+t,j+t+dispRange);
+                    temp = temp.^2;
+                    ssd = sum(sum(temp));
                 end
                 if (minssd > ssd)
                     minssd = ssd;
