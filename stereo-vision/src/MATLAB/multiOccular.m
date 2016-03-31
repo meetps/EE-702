@@ -10,4 +10,7 @@ d3 = stereo_SAD(v0, v3, 3*16);
 %% Results good till 372
 depth = (d1/1 + d2/2 + d3/3 )/3;
 
-imshow(mat2gray(depth),[]);
+depth(:,372:end) = d1(:,372:end);
+
+imshow(depth,[]);
+colormap(hot);
