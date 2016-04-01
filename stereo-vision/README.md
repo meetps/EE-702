@@ -51,5 +51,21 @@ The result files for each image in the dataset has been saved in the individual 
 ##### Multi-occular
 * In using multiple images for depth estimation, the accuracy goes up as we have more data to estimate the depth and the false positive values and matches are reduced significantly.We look at the image from a larger field of view (4 images covering almost 120 degrees) and hence the occluded regions in the object in the image reduce significantly and hence we have lesser patches/pixels whose disparity has to be estimated from the neighbourhood.
  
+#### Results  
+
+##### Input 
+![Left Image](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/view0.png)
+![Right Image](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/view1.png)
+
+##### Binoccular output 
+![NCC](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthNCC.png)
+![SAD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthSAD.png)
+![SSD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthSSD.png)
+
+##### Multi Occular output 
+![NCC](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularNCC.png)
+![SAD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularSAD.png)
+![SSD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularSSD.png)
+
 #### Future Work 
 * A lot of algorithms using dynamic programming, semi-global matching, scaled transformations and convolutional neural networks are being deployed to solve the stereo problem. I also reviewed a similar paper on the Application of convolutional neural networks for stereo matching which can be found [here](https://github.com/meetshah1995/EE-702/blob/master/paper-review/ee702_13d070003_paper_review.pdf).
