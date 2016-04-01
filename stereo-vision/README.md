@@ -63,9 +63,9 @@ The result files for each image in the dataset has been saved in the individual 
 ![SSD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthSSD.png)
 
 ##### Multi Occular output 
-![NCC](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularNCC.png)
-![SAD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularSAD.png)
-![SSD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularSSD.png)
+![NCC](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularNCC_report.png)
+![SAD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularSAD_report.png)
+![SSD](https://github.com/meetshah1995/EE-702/blob/master/stereo-vision/data/Aloe/depthMultiOccularSSD_report.png)
 
 #### Future Work 
 * A lot of algorithms using dynamic programming, semi-global matching, scaled transformations and convolutional neural networks are being deployed to solve the stereo problem. I also reviewed a similar paper on the Application of convolutional neural networks for stereo matching which can be found [here](https://github.com/meetshah1995/EE-702/blob/master/paper-review/ee702_13d070003_paper_review.pdf).
