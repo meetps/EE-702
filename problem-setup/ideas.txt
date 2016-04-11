@@ -1,0 +1,9 @@
+# Initial Ideas
+
+* Fast moving car number detection from multi-modal video
+* Textbook scan from page-flipping video without additional h/w.
+* Velocity of moving body in single image from deblurring and depth estimate.
+* Deforestation and soil erosion site detection using time-series satellite imaging.
+* 3D model reconstruction of iconic sites using large data (tourist photos)
+* Video genre classification.
+* Video completion using depth map and trajectory estimation guidance. 

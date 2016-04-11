@@ -1,0 +1,558 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family sfdefault
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\topmargin 2cm
+\rightmargin 3cm
+\bottommargin 2cm
+\secnumdepth 3
+\tocdepth 5
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\bullet 0 0 9 -1
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+EE 702 Computer Vision | Problem Setup
+\end_layout
+
+\begin_layout Author
+Meet Pragnesh Shah | 13D070003 | meetshah1995@ee.iitb.ac.in
+\end_layout
+
+\begin_layout Section
+Background & Abstract
+\end_layout
+
+\begin_layout Standard
+A large number of videos contain one or more object of attention performing
+ estimatable motion with a static natural background.
+ This motion of the objects in most natural videos can be modelled using
+ fairly simple trajectory estimation techniques.
+ The motion plane of the object which is usually a part of the natural backgroun
+d remains fixed in these frames and moves only when the camera moves.
+ The movement of the camera and the objects can be estimated from the relative
+ movement of the background and trajectory estimates respectively.
+ What I propose as a problem is the reconstruction of unkown intermediate
+ frames from such videos given the initial and end frames taking guidance
+ from the motion plane and object trajectory estimates.
+ 
+\end_layout
+
+\begin_layout Section
+Problem Description and Specifications
+\end_layout
+
+\begin_layout Standard
+Given a video 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$V(x,y,t)$
+\end_layout
+
+\end_inset
+
+ with a few frames 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$F_
+\backslash
+textrm{missing}$
+\end_layout
+
+\end_inset
+
+ missing from a time interval 
+\series bold
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T$
+\end_layout
+
+\end_inset
+
+
+\series default
+ (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T < T_
+\backslash
+textrm{threshold}$
+\end_layout
+
+\end_inset
+
+) ranging from 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$[t1,t2]$
+\end_layout
+
+\end_inset
+
+ , estimate the following :
+\end_layout
+
+\begin_layout Enumerate
+Object(s) in motion.
+\end_layout
+
+\begin_layout Enumerate
+Motion plane 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$P_
+\backslash
+textrm{motion}$
+\end_layout
+
+\end_inset
+
+ of the object(s) in motion.
+\end_layout
+
+\begin_layout Enumerate
+Motion estimate of the camera 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$v_
+\backslash
+textrm{camera}$
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Trajectory estimate of the object(s) 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$v_
+\backslash
+textrm{object}$
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Areas of the natural background that are occluded by each moving object(s)
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$A_
+\backslash
+textrm{occluded}$
+\end_layout
+
+\end_inset
+
+ in the missing frames.
+\end_layout
+
+\begin_layout Standard
+Now from the information obtained in the (1), (2), (3) and (4) obtain the
+ best estimate for the missing frames 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$F_
+\backslash
+textrm{estimate}$
+\end_layout
+
+\end_inset
+
+.
+ You may take the following assumptions : 
+\end_layout
+
+\begin_layout Itemize
+The interval 
+\series bold
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T$
+\end_layout
+
+\end_inset
+
+
+\series default
+ does not lie in the very begining or the very end of the video.
+\end_layout
+
+\begin_layout Itemize
+The temporal gradient of the frames at the boundaries of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$F_
+\backslash
+textrm{missing}$
+\end_layout
+
+\end_inset
+
+ are smooth i.e (There is no unsual motion in the missing frames).
+\end_layout
+
+\begin_layout Itemize
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T_
+\backslash
+textrm{threshold}$
+\end_layout
+
+\end_inset
+
+ is small when compared to the video interval.
+ 
+\end_layout
+
+\begin_layout Standard
+Now run this algorithm on a large number of 
+\series bold
+other
+\series default
+ similar videos ( with natural background and moving objects(s) and some
+ frames missing ) and create databases of object motion trajectories.
+ Using this database try to reconstruct the missing frames in the above
+ video using the best matching trajectory.
+ Call this estimate 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$F^{'}_
+\backslash
+textrm{estimate}$
+\end_layout
+
+\end_inset
+
+.
+ Now keep increasing the missing frames time interval 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T$
+\end_layout
+
+\end_inset
+
+ by some small constant on both sides and obtain 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$F_
+\backslash
+textrm{estimate}$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$F^{'}_
+\backslash
+textrm{estimate}$
+\end_layout
+
+\end_inset
+
+.
+ Compute the maximum missing frame interval 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T_
+\backslash
+textrm{max}$
+\end_layout
+
+\end_inset
+
+ beyond which the video similarity measure between the reconstructed and
+ original video falls below 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$alpha$
+\end_layout
+
+\end_inset
+
+ (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$alpha$
+\end_layout
+
+\end_inset
+
+ being some video similarity [eg.
+ ViSig] measure limit).
+\end_layout
+
+\begin_layout Standard
+The following video can be taken as an example : 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+https://www.youtube.com/v/GAYYMgkTHFE?start=124&end=128&version=3 
+\series default
+, where the objects in motion are the car and the helicopter, the plane
+ of motion is the road.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example input and expected output
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename strip.png
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Proposed Solution
+\end_layout
+
+\begin_layout Standard
+An outline of the solution can be viewed in the following steps : 
+\end_layout
+
+\begin_layout Itemize
+Detection of the objects in motion and their trajecctories can be easily
+ done by difference in object centroid across frames.
+\end_layout
+
+\begin_layout Itemize
+Motion of the camera can be estimated using relative shifts (disparities)
+ in the static background across frames.
+\end_layout
+
+\begin_layout Itemize
+Once the objected is segmented from the frame and its trajectory estimated,
+ the part of the image occluded by the object can be computed by shifting
+ the object segment by its estimated velocity in the image.
+\end_layout
+
+\begin_layout Itemize
+The difference in occluded regions across frames has to be reconstructed
+ (which can be done using image completion algorithm as sugested by Huang
+ et.
+ al.
+ [SIGGRAPH 2014] )
+\end_layout
+
+\begin_layout Itemize
+In order to curb unusual motion from being estimated a global objective
+ funtion which is the sum of squares of temporal gradients across consecutive
+ frames can be minimized.
+\end_layout
+
+\begin_layout Itemize
+The database creation (training) part can be also done using deep neural
+ networks where the network tries to minimize the above objective function
+ given the video and trajectories as the input.
+ The database would be nothing but a trained neural network which can then
+ be used to reconstruct videos without computing the trajectory of the objects.
+ This is just a rough idea to pose this a supervised learning problem.
+ 
+\end_layout
+
+\begin_layout Section
+Miscellaneous
+\end_layout
+
+\begin_layout Standard
+A few other problems I wished to pose a problem but had highly cited papers
+ already published on them : 
+\end_layout
+
+\begin_layout Itemize
+Velocity of moving body in single image from deblurring and depth estimate.
+\end_layout
+
+\begin_layout Itemize
+Brain tumor segmentation and classification from MRI scans.
+\end_layout
+
+\begin_layout Itemize
+Deforestation and soil erosion site detection using satellite imaging.
+\end_layout
+
+\begin_layout Itemize
+3D model reconstruction of iconic sites using large data (tourist photos)
+ 
+\end_layout
+
+\begin_layout Itemize
+Video genre classification.
+\end_layout
+
+\begin_layout Itemize
+Fast moving car number detection from multi-modal video 
+\end_layout
+
+\begin_layout Itemize
+Textbook scan from page-flipping video.
+\end_layout
+
+\end_body
+\end_document
